@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Madame's Lúpulo - App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0a0a0a',
+                            panel: '#151515',
+                            green: '#0b1f14',
+                            gold: '#c5a059',
+                            gold_light: '#dfc288'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+<style>
+        body { background-color: #0a0a0a; color: #e5e5e5; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #151515; }
+        ::-webkit-scrollbar-thumb { background: #c5a059; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dfc288; }
+        
+        /* Animações mais rápidas para tirar a sensação de lentidão */
+        .fade-in { animation: fadeIn 0.15s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Removido o blur pesado do fundo para não travar o PC/Tablet */
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.85); }
+        
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) sepia(1) saturate(5) hue-rotate(340deg); cursor: pointer; }
+
+        /* CORREÇÃO DO MODO CLARO (Light Mode) */
+        body.light-mode { background-color: #f3f4f6; color: #111827; }
+        body.light-mode .bg-brand-dark { background-color: #f9fafb !important; }
+        body.light-mode .bg-brand-dark\/50 { background-color: #f3f4f6 !important; } /* <-- Correção do Histórico */
+        body.light-mode .bg-brand-panel { background-color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        body.light-mode .bg-brand-green { background-color: #ffffff !important; border-bottom-color: #e5e7eb !important; }
+        body.light-mode .text-white { color: #111827 !important; }
+        body.light-mode .text-gray-100 { color: #111827 !important; }
+        body.light-mode .text-gray-400 { color: #4b5563 !important; }
+        body.light-mode .text-gray-300 { color: #374151 !important; }
+        body.light-mode .text-gray-200 { color: #1f2937 !important; }
+        body.light-mode .border-gray-700, body.light-mode .border-gray-800 { border-color: #e5e7eb !important; }
+        body.light-mode .bg-gray-800 { background-color: #f3f4f6 !important; }
+        body.light-mode .modal-overlay { background-color: rgba(255, 255, 255, 0.90); }
+        body.light-mode input, body.light-mode select { background-color: #ffffff !important; color: #111827 !important; border-color: #d1d5db !important; }
+        body.light-mode .bg-black\/20 { background-color: rgba(0,0,0,0.05) !important; }
+    </style>
+    </head>
+<body class="flex flex-col h-screen overflow-hidden text-sm md:text-base">
+
+    <!-- TELA DE LOGIN -->
+    <div id="view-login" class="fixed inset-0 bg-brand-dark z-[100] flex flex-col justify-center items-center p-6 transition-opacity duration-150">
+        <div class="w-full max-w-sm flex flex-col items-center fade-in">
+            <img src="LOGO.JPG" alt="Madame's Lúpulo" class="w-32 h-32 mb-6 rounded-full border-2 border-brand-gold shadow-[0_0_20px_rgba(197,160,89,0.3)] object-cover" onerror="this.src='https://placehold.co/150x150/151515/c5a059?text=ML'">
+            <h1 class="font-serif text-brand-gold text-3xl font-bold mb-1">Madame's Lúpulo</h1>
+            <p class="text-gray-400 text-sm mb-8">Gestão de PDV e Estoque</p>
+
+            <form id="form-login" onsubmit="App.fazerLogin(event)" class="w-full bg-brand-panel p-6 rounded-xl border border-brand-gold/20 shadow-2xl">
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-400 mb-1">E-mail</label>
+                    <div class="relative">
+                        <i class="ph ph-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="email" id="login-email" required class="w-full bg-brand-dark border border-gray-700 rounded-lg pl-10 pr-3 py-3 text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="email@exemplo.com">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-1">Senha</label>
+                    <div class="relative">
+                        <i class="ph ph-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" id="login-senha" required class="w-full bg-brand-dark border border-gray-700 rounded-lg pl-10 pr-3 py-3 text-white focus:outline-none focus:border-brand-gold transition-colors" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" id="btn-login" class="w-full bg-brand-gold text-brand-dark font-bold text-lg py-3 rounded-lg shadow-lg hover:bg-brand-gold_light transition-colors flex justify-center items-center gap-2">
+                    Acessar Sistema <i class="ph ph-arrow-right"></i>
+                </button>
+                <p id="login-error" class="text-red-500 text-xs text-center mt-3 hidden">Credenciais incorretas.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div id="app-content" class="hidden flex-col h-screen w-full">
+        <header class="bg-brand-green border-b border-brand-gold/20 shrink-0">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="LOGO.JPG" alt="Madame's Lúpulo" class="w-12 h-12 rounded-full border border-brand-gold/50 shadow-md object-cover" onerror="this.src='https://placehold.co/100x100/151515/c5a059?text=ML'">
+                    <div>
+                        <h1 class="font-serif text-brand-gold text-lg md:text-xl font-bold leading-tight">Madame's Lúpulo</h1>
+                        <p class="text-xs text-gray-400">Controle de PDV</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="App.openModal('modal-config')" class="text-brand-gold hover:text-white bg-brand-dark p-2 rounded-lg border border-gray-800 hover:border-brand-gold/50 transition-colors" title="Configurações">
+                        <i class="ph ph-gear text-xl"></i>
+                    </button>
+                    <button onclick="App.fazerLogout()" class="text-gray-400 hover:text-brand-gold bg-brand-dark px-3 py-2 rounded-lg border border-gray-800 hover:border-brand-gold/50 transition-colors flex items-center gap-2" title="Sair do Sistema">
+                        <span class="hidden md:inline text-xs font-bold">Sair</span><i class="ph ph-sign-out text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <nav class="max-w-5xl mx-auto px-4 flex gap-6 mt-2">
+                <button onclick="App.changeTab('pdv')" id="tab-pdv" class="tab-btn pb-2 px-1 text-brand-gold border-b-2 border-brand-gold font-medium transition-colors"><i class="ph ph-beer-stein text-lg align-middle mr-1"></i> Vender</button>
+                <button onclick="App.changeTab('estoque')" id="tab-estoque" class="tab-btn pb-2 px-1 text-gray-400 border-b-2 border-transparent hover:text-gray-200 transition-colors"><i class="ph ph-barrels text-lg align-middle mr-1"></i> Estoque</button>
+                <button onclick="App.changeTab('historico')" id="tab-historico" class="tab-btn pb-2 px-1 text-gray-400 border-b-2 border-transparent hover:text-gray-200 transition-colors"><i class="ph ph-receipt text-lg align-middle mr-1"></i> Histórico</button>
+            </nav>
+        </header>
+
+        <main class="flex-1 overflow-y-auto bg-brand-dark p-4 relative">
+            <div class="max-w-5xl mx-auto h-full">
+                <!-- ABA PDV -->
+                <div id="view-pdv" class="h-full flex flex-col fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-serif text-brand-gold">Selecione o Produto</h2>
+                        <span id="pdv-date" class="text-sm text-gray-400"></span>
+                    </div>
+                    <div id="pdv-products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 pb-20"></div>
+                </div>
+
+                <!-- ABA ESTOQUE -->
+                <div id="view-estoque" class="hidden h-full flex flex-col fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-serif text-brand-gold">Estoque Atual</h2>
+                        <button onclick="App.abrirModalNovoProduto()" class="bg-brand-gold text-brand-dark px-3 py-1.5 rounded font-bold flex items-center gap-1 hover:bg-brand-gold_light transition-colors shadow-lg">
+                            <i class="ph ph-plus-circle text-lg"></i> Novo
+                        </button>
+                    </div>
+                    <div class="bg-brand-panel rounded-lg border border-brand-gold/10 overflow-hidden shadow-xl mb-20">
+                        <ul id="estoque-list" class="divide-y divide-gray-800"></ul>
+                    </div>
+                </div>
+
+                <!-- ABA HISTORICO -->
+                <div id="view-historico" class="hidden h-full flex flex-col fade-in">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 bg-brand-green p-4 rounded-xl border border-brand-gold/30">
+                        <div class="flex flex-col">
+                            <label class="text-xs text-brand-gold font-medium mb-1">Data do Movimento</label>
+                            <input type="date" id="filtro-data" onchange="App.renderHistorico()" class="bg-brand-dark border border-brand-gold/50 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:border-brand-gold text-sm w-44">
+                        </div>
+                        <button onclick="App.abrirResumoDia()" class="w-full md:w-auto bg-brand-panel border border-brand-gold px-4 py-2 rounded-lg text-center flex items-center justify-center gap-2 hover:bg-brand-dark transition-colors shadow-lg">
+                            <i class="ph ph-chart-line-up text-brand-gold text-xl"></i>
+                            <div class="text-left">
+                                <div class="text-[10px] text-gray-400 uppercase tracking-wider">Resumo do Dia</div>
+                                <div class="font-bold text-white text-sm">Ver Detalhes</div>
+                            </div>
+                        </button>
+                    </div>
+                    <div id="historico-columns" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: CONFIGURAÇÕES -->
+    <div id="modal-config" class="modal-overlay fixed inset-0 z-[70] hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-brand-panel w-full max-w-sm rounded-xl shadow-2xl border border-brand-gold/50 p-5 transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-serif text-brand-gold font-bold flex items-center gap-2"><i class="ph ph-gear"></i> Opções do Sistema</h3>
+                <button onclick="App.closeModal('modal-config')" class="text-gray-400 hover:text-brand-gold"><i class="ph ph-x text-lg"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="App.toggleTheme()" class="w-full flex items-center justify-between bg-brand-dark border border-gray-700 p-4 rounded-lg hover:border-brand-gold transition-colors">
+                    <span class="text-white font-bold flex items-center gap-2"><i id="icon-theme" class="ph ph-sun text-brand-gold text-xl"></i> Tema Visual</span>
+                    <span id="text-theme" class="text-xs text-gray-400 font-bold uppercase tracking-wider">Escuro</span>
+                </button>
+                
+                <button onclick="App.fazerBackup()" class="w-full flex items-center justify-between bg-brand-dark border border-gray-700 p-4 rounded-lg hover:border-brand-gold transition-colors">
+                    <span class="text-white font-bold flex items-center gap-2"><i class="ph ph-download-simple text-brand-gold text-xl"></i> Fazer Backup</span>
+                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Baixar .json</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VENDA -->
+    <div id="modal-venda" class="modal-overlay fixed inset-0 z-50 hidden flex items-end md:items-center justify-center fade-in">
+        <div class="bg-brand-panel w-full md:w-[400px] rounded-t-2xl md:rounded-2xl shadow-2xl border-t md:border border-brand-gold/20 p-5 transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 id="venda-produto-nome" class="text-xl font-serif text-brand-gold font-bold">Produto</h3>
+                    <p id="venda-produto-tipo" class="text-xs text-gray-400">Tipo</p>
+                </div>
+                <button onclick="App.closeModal('modal-venda')" class="text-gray-400 hover:text-white bg-brand-dark p-2 rounded-full border border-gray-800"><i class="ph ph-x text-lg"></i></button>
+            </div>
+            
+            <input type="hidden" id="venda-produto-id">
+            <input type="hidden" id="venda-tipo-produto">
+            <input type="hidden" id="venda-preco-unitario">
+            
+            <div id="venda-controle-chopp" class="hidden mb-5">
+                <p class="text-sm text-gray-400 mb-2 font-medium">1. Selecione o Tamanho:</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="App.selectVendaSize(300)" id="btn-size-300" class="venda-size-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex flex-col items-center gap-1 hover:border-brand-gold transition-colors"><span class="font-bold text-white">300ml</span><span id="venda-preco-300" class="text-xs text-brand-gold">R$ --</span></button>
+                    <button onclick="App.selectVendaSize(400)" id="btn-size-400" class="venda-size-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex flex-col items-center gap-1 hover:border-brand-gold transition-colors"><span class="font-bold text-white">400ml</span><span id="venda-preco-400" class="text-xs text-brand-gold">R$ --</span></button>
+                    <button onclick="App.selectVendaSize(500)" id="btn-size-500" class="venda-size-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex flex-col items-center gap-1 hover:border-brand-gold transition-colors"><span class="font-bold text-white">500ml</span><span id="venda-preco-500" class="text-xs text-brand-gold">R$ --</span></button>
+                </div>
+            </div>
+
+            <div id="venda-controle-unidade" class="hidden mb-5">
+                <p class="text-sm text-gray-400 mb-2 font-medium">1. Quantidade:</p>
+                <div class="flex items-center justify-between bg-brand-dark border border-gray-700 rounded-lg p-2">
+                    <button onclick="App.alterarQtdUnidade(-1)" class="w-12 h-12 flex items-center justify-center bg-brand-panel rounded text-brand-gold border border-brand-gold/30 active:bg-brand-gold active:text-black transition-colors"><i class="ph ph-minus text-xl"></i></button>
+                    <div class="flex flex-col items-center">
+                        <span id="venda-qtd-display" class="text-2xl font-bold text-white">1</span>
+                        <span class="text-[10px] text-gray-400 uppercase">Unidades</span>
+                    </div>
+                    <button onclick="App.alterarQtdUnidade(1)" class="w-12 h-12 flex items-center justify-center bg-brand-panel rounded text-brand-gold border border-brand-gold/30 active:bg-brand-gold active:text-black transition-colors"><i class="ph ph-plus text-xl"></i></button>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-400 mb-2 font-medium">2. Pagamento:</p>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button onclick="App.selectPayment('PIX')" id="btn-pay-PIX" class="venda-pay-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex items-center justify-center gap-2 hover:border-brand-gold transition-colors font-medium"><i class="ph ph-qr-code text-brand-gold text-lg"></i> PIX</button>
+                <button onclick="App.selectPayment('Crédito')" id="btn-pay-Crédito" class="venda-pay-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex items-center justify-center gap-2 hover:border-brand-gold transition-colors font-medium"><i class="ph ph-credit-card text-brand-gold text-lg"></i> Crédito</button>
+                <button onclick="App.selectPayment('Débito')" id="btn-pay-Débito" class="venda-pay-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex items-center justify-center gap-2 hover:border-brand-gold transition-colors font-medium"><i class="ph ph-cardholder text-brand-gold text-lg"></i> Débito</button>
+                <button onclick="App.selectPayment('Dinheiro')" id="btn-pay-Dinheiro" class="venda-pay-btn border border-gray-700 bg-brand-dark rounded-lg py-3 flex items-center justify-center gap-2 hover:border-brand-gold transition-colors font-medium"><i class="ph ph-money text-brand-gold text-lg"></i> Dinheiro</button>
+            </div>
+
+            <div class="flex items-center justify-between mb-4 px-2">
+                <span class="text-gray-400 text-sm">Total da Saída:</span>
+                <span id="venda-total-display" class="text-2xl font-bold text-brand-gold">R$ 0,00</span>
+            </div>
+
+            <button onclick="App.confirmarVenda()" class="w-full bg-brand-gold text-brand-dark font-bold text-lg py-3 rounded-lg shadow-[0_0_15px_rgba(197,160,89,0.4)] hover:bg-brand-gold_light transition-colors flex items-center justify-center gap-2">
+                <i class="ph ph-check-circle text-xl"></i> Confirmar Saída
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PRODUTO -->
+    <div id="modal-produto" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-brand-panel w-full max-w-md rounded-xl shadow-2xl border border-brand-gold/20 p-5 overflow-y-auto max-h-[90vh] transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="form-produto-titulo" class="text-xl font-serif text-brand-gold font-bold">Cadastrar Produto</h3>
+                <button type="button" onclick="App.closeModal('modal-produto')" class="text-gray-400 hover:text-white bg-brand-dark p-2 rounded-full border border-gray-800"><i class="ph ph-x"></i></button>
+            </div>
+            
+            <form id="form-produto" onsubmit="App.salvarProduto(event)" class="space-y-4">
+                <input type="hidden" id="prod-id">
+                <div class="bg-brand-dark p-1 rounded-lg flex border border-gray-700 mb-4">
+                    <button type="button" id="btn-tipo-chopp" onclick="App.setTipoProduto('chopp')" class="flex-1 py-2 text-sm font-bold rounded bg-brand-gold text-brand-dark transition-colors">Chopp (Litros)</button>
+                    <button type="button" id="btn-tipo-unidade" onclick="App.setTipoProduto('unidade')" class="flex-1 py-2 text-sm font-bold rounded text-gray-400 hover:text-white transition-colors">Outro (Unidade)</button>
+                </div>
+                <input type="hidden" id="prod-tipo" value="chopp">
+
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Nome do Produto</label>
+                    <input type="text" id="prod-nome" required class="w-full bg-brand-dark border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-gold" placeholder="Ex: IPA ou Água com Gás">
+                </div>
+                
+                <div>
+                    <label id="label-estoque" class="block text-sm text-gray-400 mb-1">Estoque Inicial (Litros)</label>
+                    <input type="number" id="prod-estoque" step="0.1" min="0" required class="w-full bg-brand-dark border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-gold">
+                </div>
+
+                <div id="bloco-preco-chopp" class="p-3 bg-brand-dark/50 border border-brand-gold/10 rounded-lg">
+                    <label class="block text-sm text-brand-gold mb-2 font-medium">Preços por Copo (R$)</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div><label class="block text-xs text-gray-400 mb-1">300ml</label><input type="number" id="prod-preco-300" step="0.01" min="0" class="w-full bg-brand-dark border border-gray-700 rounded px-2 py-1.5 text-white text-sm focus:border-brand-gold"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">400ml</label><input type="number" id="prod-preco-400" step="0.01" min="0" class="w-full bg-brand-dark border border-gray-700 rounded px-2 py-1.5 text-white text-sm focus:border-brand-gold"></div>
+                        <div><label class="block text-xs text-gray-400 mb-1">500ml</label><input type="number" id="prod-preco-500" step="0.01" min="0" class="w-full bg-brand-dark border border-gray-700 rounded px-2 py-1.5 text-white text-sm focus:border-brand-gold"></div>
+                    </div>
+                </div>
+
+                <div id="bloco-preco-unidade" class="hidden p-3 bg-brand-dark/50 border border-brand-gold/10 rounded-lg">
+                    <label class="block text-sm text-brand-gold mb-2 font-medium">Preço de Venda (R$)</label>
+                    <input type="number" id="prod-preco-unico" step="0.01" min="0" class="w-full bg-brand-dark border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-gold">
+                </div>
+
+                <div class="pt-4 flex gap-2">
+                    <button type="button" onclick="App.closeModal('modal-produto')" class="flex-1 bg-brand-dark border border-gray-700 text-gray-300 py-2.5 rounded-lg hover:bg-gray-800 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-green border border-brand-gold/50 text-brand-gold font-bold py-2.5 rounded-lg shadow-lg hover:bg-[#0f2e1b] transition-colors">Salvar Dados</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD ESTOQUE -->
+    <div id="modal-barril" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-brand-panel w-full max-w-sm rounded-xl shadow-2xl border border-brand-gold/20 p-5 transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <h3 class="text-xl font-serif text-brand-gold font-bold mb-2">Adicionar Estoque</h3>
+            <p class="text-sm text-gray-300 mb-4">Adicionando a <strong id="barril-nome-produto" class="text-white"></strong></p>
+            
+            <input type="hidden" id="barril-produto-id">
+            <input type="hidden" id="barril-tipo-produto">
+            
+            <div id="atalhos-chopp" class="grid grid-cols-3 gap-2 mb-4 hidden">
+                <button onclick="App.setBarrilQtd(30)" class="border border-brand-gold/30 bg-brand-dark rounded-lg py-2 text-brand-gold font-bold hover:bg-brand-gold hover:text-black">30 L</button>
+                <button onclick="App.setBarrilQtd(50)" class="border border-brand-gold/30 bg-brand-dark rounded-lg py-2 text-brand-gold font-bold hover:bg-brand-gold hover:text-black">50 L</button>
+                <button onclick="App.setBarrilQtd(0)" class="border border-gray-700 bg-brand-dark rounded-lg py-2 hover:border-white text-xs">Outro</button>
+            </div>
+            <div id="atalhos-unidade" class="grid grid-cols-3 gap-2 mb-4 hidden">
+                <button onclick="App.setBarrilQtd(12)" class="border border-brand-gold/30 bg-brand-dark rounded-lg py-2 text-brand-gold font-bold hover:bg-brand-gold hover:text-black">+ 12</button>
+                <button onclick="App.setBarrilQtd(24)" class="border border-brand-gold/30 bg-brand-dark rounded-lg py-2 text-brand-gold font-bold hover:bg-brand-gold hover:text-black">+ 24</button>
+                <button onclick="App.setBarrilQtd(0)" class="border border-gray-700 bg-brand-dark rounded-lg py-2 hover:border-white text-xs">Outro</button>
+            </div>
+            
+            <div class="mb-6">
+                <label id="label-qtd-add" class="block text-sm text-gray-400 mb-1">Quantidade Exata</label>
+                <input type="number" id="barril-quantidade" step="0.1" min="0.1" class="w-full bg-brand-dark border border-brand-gold/50 rounded-lg px-3 py-3 text-white text-lg font-bold text-center focus:outline-none focus:border-brand-gold shadow-inner">
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="App.closeModal('modal-barril')" class="flex-1 bg-brand-dark border border-gray-700 text-gray-300 py-3 rounded-lg hover:bg-gray-800 font-medium">Cancelar</button>
+                <button onclick="App.confirmarEntradaBarril()" class="flex-1 bg-brand-gold text-brand-dark font-bold py-3 rounded-lg hover:bg-brand-gold_light shadow-lg">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: RESUMO DIA -->
+    <div id="modal-resumo" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-brand-panel w-full max-w-sm rounded-xl shadow-2xl border border-brand-gold/20 flex flex-col max-h-[80vh] transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-brand-green rounded-t-xl">
+                <div><h3 class="text-lg font-serif text-brand-gold font-bold">Fechamento de Caixa</h3><p id="resumo-data-label" class="text-xs text-gray-300"></p></div>
+                <button onclick="App.closeModal('modal-resumo')" class="text-white hover:text-brand-gold bg-black/20 p-2 rounded-full"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-400 uppercase tracking-widest mb-1">Receita Total</p>
+                    <h2 id="resumo-total-geral" class="text-3xl font-bold text-brand-gold">R$ 0,00</h2>
+                </div>
+                <h4 class="text-sm font-bold text-white border-b border-gray-800 pb-2 mb-3"><i class="ph ph-wallet mr-1 text-brand-gold"></i> Por Pagamento</h4>
+                <div class="space-y-2 mb-6 text-sm" id="resumo-pagamentos"></div>
+                <h4 class="text-sm font-bold text-white border-b border-gray-800 pb-2 mb-3"><i class="ph ph-beer-stein mr-1 text-brand-gold"></i> Por Produto</h4>
+                <div class="space-y-3 text-sm" id="resumo-produtos"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR VENDA -->
+    <div id="modal-editar-venda" class="modal-overlay fixed inset-0 z-[60] hidden flex items-center justify-center p-4 fade-in">
+        <div class="bg-brand-panel w-full max-w-sm rounded-xl shadow-2xl border border-brand-gold/50 p-5 transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
+            <h3 class="text-lg font-serif text-brand-gold font-bold mb-4 flex items-center gap-2"><i class="ph ph-pencil-simple"></i> Editar Venda</h3>
+            <form id="form-editar-venda" onsubmit="App.salvarEdicaoVenda(event)">
+                <input type="hidden" id="edit-venda-id">
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-400 mb-1">Nova Quantidade Correta</label>
+                    <div class="flex gap-2" id="edit-qtd-container"></div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-400 mb-1">Forma de Pagamento</label>
+                    <select id="edit-pagamento" class="w-full bg-brand-dark border border-gray-700 rounded px-3 py-2 text-white focus:border-brand-gold">
+                        <option value="PIX">PIX</option>
+                        <option value="Crédito">Crédito</option>
+                        <option value="Débito">Débito</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="App.closeModal('modal-editar-venda')" class="flex-1 border border-gray-700 text-gray-300 py-2 rounded hover:bg-gray-800">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-brand-gold text-brand-dark font-bold py-2 rounded hover:bg-brand-gold_light">Salvar Correção</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST ALERTAS -->
+    <div id="toast" class="fixed top-4 right-4 z-[110] transform transition-all duration-300 translate-y-[-150%] opacity-0 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+        <i id="toast-icon" class="ph ph-check-circle text-2xl"></i>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Aviso</h4>
+            <p class="text-xs text-gray-300" id="toast-msg">Mensagem.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = 'madames-lupulo-pdv';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzMPUueDrwR9RN5MqSchS6tsGjLv6C8NY",
+            authDomain: "madameslupulo-a18f4.firebaseapp.com",
+            projectId: "madameslupulo-a18f4",
+            storageBucket: "madameslupulo-a18f4.firebasestorage.app",
+            messagingSenderId: "243402055002",
+            appId: "1:243402055002:web:b1148f3fdfcd8fa03da763"
+        };
+        
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) { console.error("Firebase init error", e); }
+
+        window.App = {
+            state: {
+                userId: null,
+                produtos: [],
+                historico: [],
+                vendaAtual: { produtoId: null, tamanho: null, pagamento: null, precoTotal: 0, quantidade: 1 },
+                injetado: false
+            },
+
+            init() {
+                const hojeStr = new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
+                document.getElementById('pdv-date').textContent = hojeStr;
+                
+                const dataLocal = new Date();
+                const offset = dataLocal.getTimezoneOffset() * 60000;
+                document.getElementById('filtro-data').value = new Date(dataLocal.getTime() - offset).toISOString().split('T')[0];
+
+                if(localStorage.getItem('theme') === 'light') {
+                    document.body.classList.add('light-mode');
+                    document.getElementById('icon-theme').className = 'ph ph-sun text-brand-gold text-xl';
+                    document.getElementById('text-theme').textContent = 'CLARO';
+                }
+
+                if(auth) {
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            this.state.userId = user.uid;
+                            document.getElementById('view-login').classList.add('hidden');
+                            document.getElementById('app-content').classList.remove('hidden');
+                            document.getElementById('app-content').classList.add('flex', 'flex-col');
+                            this.listenData();
+                        } else {
+                            this.state.userId = null;
+                            document.getElementById('app-content').classList.add('hidden');
+                            document.getElementById('app-content').classList.remove('flex', 'flex-col');
+                            document.getElementById('view-login').classList.remove('hidden');
+                            document.getElementById('view-login').classList.add('flex');
+                        }
+                    });
+                }
+            },
+
+            toggleTheme() {
+                const isLight = document.body.classList.toggle('light-mode');
+                document.getElementById('icon-theme').className = isLight ? 'ph ph-sun text-brand-gold text-xl' : 'ph ph-moon text-brand-gold text-xl';
+                document.getElementById('text-theme').textContent = isLight ? 'CLARO' : 'ESCURO';
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            },
+
+            fazerBackup() {
+                this.showToast('Processando...', 'Gerando arquivo de backup...', 'info');
+                
+                const backupData = {
+                    data_extracao: new Date().toISOString(),
+                    produtos: this.state.produtos,
+                    historico: this.state.historico
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                
+                const dataAtual = new Date().toLocaleDateString('pt-BR').replaceAll('/', '-');
+                downloadAnchorNode.setAttribute("download", `backup-madameslupulo-${dataAtual}.json`);
+                
+                document.body.appendChild(downloadAnchorNode); 
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+                
+                setTimeout(() => {
+                    this.showToast('Sucesso', 'Backup baixado com sucesso!');
+                    this.closeModal('modal-config');
+                }, 1000);
+            },
+
+            async fazerLogin(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const senha = document.getElementById('login-senha').value;
+                const btn = document.getElementById('btn-login');
+                const err = document.getElementById('login-error');
+                
+                err.classList.add('hidden');
+                const btnOld = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Autenticando...';
+                btn.disabled = true;
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, senha);
+                } catch(error) {
+                    err.classList.remove('hidden');
+                } finally {
+                    btn.innerHTML = btnOld;
+                    btn.disabled = false;
+                }
+            },
+
+            async fazerLogout() { if(auth) await signOut(auth); },
+
+            async listenData() {
+                if (!this.state.userId) return;
+                
+                const colProd = collection(db, 'artifacts', appId, 'users', this.state.userId, 'produtos');
+                onSnapshot(colProd, (snap) => {
+                    this.state.produtos = [];
+                    snap.forEach(doc => this.state.produtos.push({ id_doc: doc.id, ...doc.data() }));
+                    
+                    if (this.state.produtos.length === 0 && !this.state.injetado) {
+                        this.state.injetado = true;
+                        this.injetarProdutosBasicos();
+                    }
+                    
+                    this.renderPDV();
+                    this.renderEstoque();
+                }, (err) => console.error(err));
+
+                const colHist = collection(db, 'artifacts', appId, 'users', this.state.userId, 'historico');
+                onSnapshot(colHist, (snap) => {
+                    this.state.historico = [];
+                    snap.forEach(doc => this.state.historico.push({ id_doc: doc.id, ...doc.data() }));
+                    this.renderHistorico();
+                }, (err) => console.error(err));
+            },
+
+            async injetarProdutosBasicos() {
+                this.showToast('Inicializando', 'Criando produtos padrão...', 'info');
+                const colProd = collection(db, 'artifacts', appId, 'users', this.state.userId, 'produtos');
+                const padroes = [
+                    { nome: 'Pilsen Artesanal', tipo: 'chopp', estoque: 50.0, precos: { 300: 10, 400: 13, 500: 15 } },
+                    { nome: 'IPA Lúpulo', tipo: 'chopp', estoque: 30.0, precos: { 300: 14, 400: 17, 500: 20 } },
+                    { nome: 'Red Ale', tipo: 'chopp', estoque: 25.5, precos: { 300: 12, 400: 15, 500: 18 } },
+                    { nome: 'Água com Gás', tipo: 'unidade', estoque: 50, precoUnico: 5 },
+                    { nome: 'Água sem Gás', tipo: 'unidade', estoque: 50, precoUnico: 4 }
+                ];
+                for(let p of padroes) { await addDoc(colProd, p); }
+            },
+
+            changeTab(tabName) {
+                ['pdv', 'estoque', 'historico'].forEach(t => {
+                    document.getElementById(`view-${t}`).classList.add('hidden');
+                    const btn = document.getElementById(`tab-${t}`);
+                    btn.classList.remove('text-brand-gold', 'border-brand-gold');
+                    btn.classList.add('text-gray-400', 'border-transparent');
+                });
+                document.getElementById(`view-${tabName}`).classList.remove('hidden');
+                const btnActive = document.getElementById(`tab-${tabName}`);
+                btnActive.classList.remove('text-gray-400', 'border-transparent');
+                btnActive.classList.add('text-brand-gold', 'border-brand-gold');
+            },
+
+            renderPDV() {
+                const grid = document.getElementById('pdv-products-grid');
+                grid.innerHTML = '';
+                if(this.state.produtos.length === 0) return grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 mt-10">Carregando produtos...</div>`;
+
+                this.state.produtos.forEach(p => {
+                    let stockColor = 'text-green-500';
+                    let alertaBg = '';
+                    if (p.estoque <= (p.tipo === 'unidade' ? 20 : 10)) { stockColor = 'text-yellow-500'; }
+                    if (p.estoque <= (p.tipo === 'unidade' ? 5 : 3)) { stockColor = 'text-red-500'; alertaBg = 'animate-pulse bg-red-900/20'; }
+
+                    const card = document.createElement('button');
+                    card.className = `bg-brand-panel border border-brand-gold/10 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 hover:border-brand-gold/50 shadow-lg active:scale-95 ${alertaBg}`;
+                    if(p.estoque <= 0) { card.classList.add('opacity-40', 'grayscale'); card.disabled = true; }
+
+                    card.onclick = () => this.abrirNovaVenda(p);
+                    card.innerHTML = `
+                        <div class="w-14 h-14 rounded-full bg-brand-dark flex items-center justify-center border border-brand-gold/30 shadow-inner">
+                            <i class="ph ${p.tipo === 'unidade' ? 'ph-package' : 'ph-beer-stein'} text-3xl text-brand-gold"></i>
+                        </div>
+                        <h3 class="font-bold text-center text-gray-100 leading-tight">${p.nome}</h3>
+                        <div class="text-xs ${stockColor} font-bold mt-auto bg-brand-dark px-3 py-1.5 rounded-full border border-gray-800 flex items-center gap-1">
+                            <i class="ph ph-info"></i> ${p.estoque.toFixed(1).replace('.',',')} ${p.tipo === 'unidade' ? 'un' : 'L'}
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
+
+            renderEstoque() {
+                const list = document.getElementById('estoque-list');
+                list.innerHTML = '';
+                this.state.produtos.forEach(p => {
+                    const li = document.createElement('li');
+                    li.className = "p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-brand-dark/40 border-b border-gray-800";
+                    const maxCap = p.tipo === 'unidade' ? 100 : 50;
+                    const pct = Math.min((p.estoque / maxCap) * 100, 100);
+                    
+                    let barColor = 'bg-green-500';
+                    if (p.estoque <= (p.tipo === 'unidade' ? 20 : 10)) barColor = 'bg-yellow-500';
+                    if (p.estoque <= (p.tipo === 'unidade' ? 5 : 3)) barColor = 'bg-red-500';
+
+                    const precosTxt = p.tipo === 'unidade' ? `R$ ${p.precoUnico.toFixed(2)}` : `300ml: R$${p.precos[300]} | 400ml: R$${p.precos[400]} | 500ml: R$${p.precos[500]}`;
+
+                    li.innerHTML = `
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-gray-800 text-gray-300 text-[10px] uppercase px-2 py-0.5 rounded font-bold">${p.tipo === 'unidade' ? 'Unidade' : 'Chopp'}</span>
+                                <h4 class="font-bold text-white text-base">${p.nome}</h4>
+                                <button onclick="App.editarProduto('${p.id_doc}')" class="ml-2 text-brand-gold hover:text-white p-1 bg-brand-dark rounded border border-gray-800"><i class="ph ph-pencil-simple"></i></button>
+                            </div>
+                            <div class="w-full bg-brand-dark rounded-full h-2 mb-1.5 border border-gray-800 overflow-hidden"><div class="${barColor} h-full rounded-full transition-all duration-1000" style="width: ${pct}%"></div></div>
+                            <div class="flex justify-between text-xs text-gray-400 font-medium"><span>${p.estoque.toFixed(1).replace('.',',')} ${p.tipo === 'unidade' ? 'Unidades' : 'Litros'}</span><span>${precosTxt}</span></div>
+                        </div>
+                        <div class="shrink-0">
+                            <button onclick="App.abrirModalBarril('${p.id_doc}')" class="w-full sm:w-auto bg-brand-dark border border-brand-gold/40 text-brand-gold text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-black shadow-lg">
+                                <i class="ph ph-plus-circle"></i> Estoque
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            },
+
+            renderHistorico() {
+                const columns = document.getElementById('historico-columns');
+                columns.innerHTML = '';
+                const filtroData = document.getElementById('filtro-data').value;
+                if(!filtroData) return;
+
+                const vendasDoDia = this.state.historico.filter(h => h.data && h.data.startsWith(filtroData));
+                const agrupado = {};
+                
+                vendasDoDia.forEach(v => {
+                    if(!agrupado[v.produtoId]) agrupado[v.produtoId] = { nome: v.produtoNome, tipo: v.tipo, totalRs: 0, totalQtd: 0, itens: [] };
+                    agrupado[v.produtoId].totalRs += v.precoTotal;
+                    if(v.tipo === 'unidade') agrupado[v.produtoId].totalQtd += v.quantidade;
+                    else agrupado[v.produtoId].totalQtd += (v.quantidade / 1000);
+                    agrupado[v.produtoId].itens.push(v);
+                });
+
+                if(Object.keys(agrupado).length === 0) return columns.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 mt-4 border border-dashed border-gray-700 rounded-xl">Nenhuma saída registrada nesta data.</div>`;
+
+                Object.values(agrupado).forEach(grupo => {
+                    const col = document.createElement('div');
+                    col.className = "bg-brand-panel border border-brand-gold/20 rounded-xl flex flex-col h-[60vh] md:h-[70vh] shadow-xl overflow-hidden";
+                    const undStr = grupo.tipo === 'unidade' ? 'un' : 'L';
+                    
+                    let htmlList = `<div class="bg-brand-green p-4 border-b border-brand-gold/30 shrink-0">
+                        <h3 class="font-serif text-brand-gold font-bold text-lg truncate">${grupo.nome}</h3>
+                        <div class="flex justify-between mt-2">
+                            <div><div class="text-[10px] text-gray-400 uppercase">Saída Total</div><div class="font-bold text-white">${grupo.totalQtd.toFixed(1).replace('.',',')} ${undStr}</div></div>
+                            <div class="text-right"><div class="text-[10px] text-gray-400 uppercase">Receita</div><div class="font-bold text-brand-gold">R$ ${grupo.totalRs.toFixed(2).replace('.',',')}</div></div>
+                        </div>
+                    </div><div class="flex-1 overflow-y-auto p-2 space-y-1">`;
+                    
+                    grupo.itens.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(item => {
+                        const d = new Date(item.data);
+                        const time = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        const descQtd = item.tipo === 'unidade' ? `${item.quantidade}x` : `${item.quantidade}ml`;
+                        const pontoAudit = item.editada ? `<div class="w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_5px_red]" title="Venda Editada"></div>` : '';
+                        
+                        htmlList += `
+                            <div class="bg-brand-dark/50 p-2.5 rounded border border-gray-800 flex justify-between items-center group">
+                                <div class="flex items-center gap-2">
+                                    <div class="text-gray-500 text-xs font-mono w-10">${time}</div>
+                                    <div>
+                                        <div class="text-gray-200 font-bold text-sm">${descQtd}</div>
+                                        <div class="text-[10px] text-brand-gold flex items-center gap-1"><i class="ph ph-wallet text-xs"></i> ${item.pagamento}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    ${pontoAudit}
+                                    <div class="text-white font-medium text-sm">R$ ${item.precoTotal.toFixed(2).replace('.',',')}</div>
+                                    <button onclick="App.abrirEdicaoVenda('${item.id_doc}')" class="text-gray-500 hover:text-brand-gold"><i class="ph ph-dots-three-vertical text-xl"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    htmlList += `</div>`;
+                    col.innerHTML = htmlList;
+                    columns.appendChild(col);
+                });
+            },
+
+            abrirEdicaoVenda(idVenda) {
+                const venda = this.state.historico.find(v => v.id_doc === idVenda);
+                const produto = this.state.produtos.find(p => p.id_doc === venda.produtoId);
+                if(!venda || !produto) return;
+
+                document.getElementById('edit-venda-id').value = venda.id_doc;
+                document.getElementById('edit-pagamento').value = venda.pagamento;
+                const container = document.getElementById('edit-qtd-container');
+
+                if(venda.tipo === 'chopp') {
+                    container.innerHTML = `
+                        <select id="edit-quantidade" class="w-full bg-brand-dark border border-gray-700 rounded px-3 py-2 text-white">
+                            <option value="300" ${venda.quantidade === 300 ? 'selected' : ''}>300ml - R$ ${produto.precos[300].toFixed(2)}</option>
+                            <option value="400" ${venda.quantidade === 400 ? 'selected' : ''}>400ml - R$ ${produto.precos[400].toFixed(2)}</option>
+                            <option value="500" ${venda.quantidade === 500 ? 'selected' : ''}>500ml - R$ ${produto.precos[500].toFixed(2)}</option>
+                        </select>
+                    `;
+                } else {
+                    container.innerHTML = `<input type="number" id="edit-quantidade" min="1" value="${venda.quantidade}" class="w-full bg-brand-dark border border-gray-700 rounded px-3 py-2 text-white text-center">`;
+                }
+                this.openModal('modal-editar-venda');
+            },
+
+            async salvarEdicaoVenda(e) {
+                e.preventDefault();
+                this.closeModal('modal-editar-venda');
+                this.showToast('Processando...', 'Calculando estorno no estoque...', 'info');
+
+                const idVenda = document.getElementById('edit-venda-id').value;
+                const novaQtd = parseInt(document.getElementById('edit-quantidade').value);
+                const novoPagamento = document.getElementById('edit-pagamento').value;
+
+                const venda = this.state.historico.find(v => v.id_doc === idVenda);
+                const produto = this.state.produtos.find(p => p.id_doc === venda.produtoId);
+
+                const diferencaQtd = novaQtd - venda.quantidade; 
+                const diferencaEstoqueAbater = venda.tipo === 'unidade' ? diferencaQtd : (diferencaQtd / 1000);
+                const novoPrecoTotal = venda.tipo === 'unidade' ? (novaQtd * produto.precoUnico) : produto.precos[novaQtd];
+
+                if(produto.estoque < diferencaEstoqueAbater) return this.showToast('Estoque Insuficiente', 'Não há estoque para aumentar essa venda.', 'error');
+
+                try {
+                    if(diferencaEstoqueAbater !== 0) {
+                        const refProd = doc(db, 'artifacts', appId, 'users', this.state.userId, 'produtos', produto.id_doc);
+                        await setDoc(refProd, { estoque: produto.estoque - diferencaEstoqueAbater }, { merge: true });
+                    }
+                    const refHist = doc(db, 'artifacts', appId, 'users', this.state.userId, 'historico', idVenda);
+                    await setDoc(refHist, { quantidade: novaQtd, precoTotal: novoPrecoTotal, pagamento: novoPagamento, editada: true }, { merge: true });
+                    this.showToast('Atualizado', 'A venda foi corrigida.');
+                } catch(err) {
+                    this.showToast('Erro de Permissão', 'A edição foi bloqueada pelo banco.', 'error');
+                }
+            },
+
+            abrirResumoDia() {
+                const filtroData = document.getElementById('filtro-data').value;
+                if(!filtroData) return;
+                
+                const vendas = this.state.historico.filter(h => h.data && h.data.startsWith(filtroData));
+                let tGeral = 0;
+                const payTotals = { "PIX": 0, "Dinheiro": 0, "Crédito": 0, "Débito": 0 };
+                const prodTotals = {};
+
+                vendas.forEach(v => {
+                    tGeral += v.precoTotal;
+                    if(payTotals[v.pagamento] !== undefined) payTotals[v.pagamento] += v.precoTotal;
+                    if(!prodTotals[v.produtoNome]) prodTotals[v.produtoNome] = 0;
+                    prodTotals[v.produtoNome] += v.precoTotal;
+                });
+
+                document.getElementById('resumo-total-geral').textContent = `R$ ${tGeral.toFixed(2).replace('.',',')}`;
+
+                let payHtml = '';
+                Object.entries(payTotals).forEach(([k, v]) => { if(v > 0) payHtml += `<div class="flex justify-between items-center text-gray-300"><span>${k}</span><span class="font-bold text-white">R$ ${v.toFixed(2).replace('.',',')}</span></div>`; });
+                document.getElementById('resumo-pagamentos').innerHTML = payHtml || '<div class="text-gray-500 text-xs">Sem dados</div>';
+
+                let prodHtml = '';
+                Object.entries(prodTotals).forEach(([k, v]) => { prodHtml += `<div class="flex justify-between items-center text-gray-300"><span class="truncate pr-2">${k}</span><span class="font-bold text-brand-gold">R$ ${v.toFixed(2).replace('.',',')}</span></div>`; });
+                document.getElementById('resumo-produtos').innerHTML = prodHtml || '<div class="text-gray-500 text-xs">Sem dados</div>';
+
+                this.openModal('modal-resumo');
+            },
+
+            abrirNovaVenda(p) {
+                this.state.vendaAtual = { produtoId: p.id_doc, tamanho: null, pagamento: null, precoTotal: 0, quantidade: 1, tipo: p.tipo };
+
+                document.getElementById('venda-produto-nome').textContent = p.nome;
+                document.getElementById('venda-produto-tipo').textContent = p.tipo === 'unidade' ? 'Venda por Unidade' : 'Chopp (ml)';
+                document.getElementById('venda-produto-id').value = p.id_doc;
+                
+                document.querySelectorAll('.venda-pay-btn').forEach(btn => {
+                    btn.classList.remove('border-brand-gold', 'bg-brand-green/30', 'text-brand-gold');
+                    btn.classList.add('border-gray-700', 'bg-brand-dark');
+                });
+                this.atualizarDisplayTotalVenda();
+
+                if (p.tipo === 'chopp') {
+                    document.getElementById('venda-controle-unidade').classList.add('hidden');
+                    document.getElementById('venda-controle-chopp').classList.remove('hidden');
+                    document.getElementById('venda-preco-300').textContent = `R$ ${p.precos[300].toFixed(2)}`;
+                    document.getElementById('venda-preco-400').textContent = `R$ ${p.precos[400].toFixed(2)}`;
+                    document.getElementById('venda-preco-500').textContent = `R$ ${p.precos[500].toFixed(2)}`;
+                    
+                    document.querySelectorAll('.venda-size-btn').forEach(btn => {
+                        btn.classList.remove('border-brand-gold', 'bg-brand-green/30');
+                        btn.classList.add('border-gray-700', 'bg-brand-dark');
+                    });
+                } else {
+                    document.getElementById('venda-controle-chopp').classList.add('hidden');
+                    document.getElementById('venda-controle-unidade').classList.remove('hidden');
+                    document.getElementById('venda-preco-unitario').value = p.precoUnico;
+                    this.state.vendaAtual.tamanho = 'unidade';
+                    this.alterarQtdUnidade(0);
+                }
+                this.openModal('modal-venda');
+            },
+
+            selectVendaSize(ml) {
+                this.state.vendaAtual.tamanho = ml;
+                this.state.vendaAtual.quantidade = ml;
+                const p = this.state.produtos.find(x => x.id_doc === this.state.vendaAtual.produtoId);
+                this.state.vendaAtual.precoTotal = p.precos[ml];
+
+                document.querySelectorAll('.venda-size-btn').forEach(btn => {
+                    btn.classList.remove('border-brand-gold', 'bg-brand-green/30');
+                    btn.classList.add('border-gray-700', 'bg-brand-dark');
+                });
+                const btn = document.getElementById(`btn-size-${ml}`);
+                btn.classList.remove('border-gray-700', 'bg-brand-dark');
+                btn.classList.add('border-brand-gold', 'bg-brand-green/30');
+                this.atualizarDisplayTotalVenda();
+            },
+
+            alterarQtdUnidade(delta) {
+                let novaQtd = this.state.vendaAtual.quantidade + delta;
+                if(novaQtd < 1) novaQtd = 1;
+                this.state.vendaAtual.quantidade = novaQtd;
+                
+                const precoUnico = parseFloat(document.getElementById('venda-preco-unitario').value);
+                this.state.vendaAtual.precoTotal = novaQtd * precoUnico;
+                document.getElementById('venda-qtd-display').textContent = novaQtd;
+                this.atualizarDisplayTotalVenda();
+            },
+
+            selectPayment(metodo) {
+                this.state.vendaAtual.pagamento = metodo;
+                document.querySelectorAll('.venda-pay-btn').forEach(btn => {
+                    btn.classList.remove('border-brand-gold', 'bg-brand-green/30', 'text-brand-gold');
+                    btn.classList.add('border-gray-700', 'bg-brand-dark');
+                });
+                const btn = document.getElementById(`btn-pay-${metodo}`);
+                btn.classList.remove('border-gray-700', 'bg-brand-dark');
+                btn.classList.add('border-brand-gold', 'bg-brand-green/30', 'text-brand-gold');
+            },
+
+            atualizarDisplayTotalVenda() {
+                document.getElementById('venda-total-display').textContent = `R$ ${this.state.vendaAtual.precoTotal.toFixed(2).replace('.',',')}`;
+            },
+
+            async confirmarVenda() {
+                const v = this.state.vendaAtual;
+                if(!v.tamanho || !v.pagamento) return this.showToast('Atenção', 'Selecione a quantidade e o pagamento.', 'error');
+
+                const produto = this.state.produtos.find(x => x.id_doc === v.produtoId);
+                const qtdAbater = v.tipo === 'unidade' ? v.quantidade : (v.quantidade / 1000);
+                
+                if (produto.estoque < qtdAbater) return this.showToast('Estoque', 'Saldo insuficiente.', 'error');
+
+                this.closeModal('modal-venda'); // FECHA IMEDIATAMENTE
+                this.showToast('Enviando...', 'Registrando venda...', 'info');
+
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', this.state.userId, 'produtos', produto.id_doc);
+                    await setDoc(docRef, { estoque: produto.estoque - qtdAbater }, { merge: true });
+
+                    const dataLocal = new Date();
+                    const offset = dataLocal.getTimezoneOffset() * 60000;
+                    const dataFormatadaParaSalvamento = new Date(dataLocal.getTime() - offset).toISOString().replace('Z', '');
+
+                    const colRef = collection(db, 'artifacts', appId, 'users', this.state.userId, 'historico');
+                    await addDoc(colRef, {
+                        data: dataFormatadaParaSalvamento,
+                        produtoId: produto.id_doc,
+                        produtoNome: produto.nome,
+                        tipo: v.tipo,
+                        quantidade: v.quantidade,
+                        precoTotal: v.precoTotal,
+                        pagamento: v.pagamento
+                    });
+                    
+                    this.showToast('Sucesso', 'Venda registrada com sucesso!');
+                } catch(e) {
+                    this.showToast('Erro de Permissão', 'Operação bloqueada pelo banco de dados.', 'error');
+                }
+            },
+
+            setTipoProduto(tipo) {
+                document.getElementById('prod-tipo').value = tipo;
+                const btnC = document.getElementById('btn-tipo-chopp');
+                const btnU = document.getElementById('btn-tipo-unidade');
+                const blocoC = document.getElementById('bloco-preco-chopp');
+                const blocoU = document.getElementById('bloco-preco-unidade');
+                
+                if (tipo === 'chopp') {
+                    btnC.className = "flex-1 py-2 text-sm font-bold rounded bg-brand-gold text-brand-dark";
+                    btnU.className = "flex-1 py-2 text-sm font-bold rounded text-gray-400 hover:text-white";
+                    blocoC.classList.remove('hidden'); blocoU.classList.add('hidden');
+                    document.getElementById('label-estoque').textContent = "Estoque Inicial (Litros)";
+                } else {
+                    btnU.className = "flex-1 py-2 text-sm font-bold rounded bg-brand-gold text-brand-dark";
+                    btnC.className = "flex-1 py-2 text-sm font-bold rounded text-gray-400 hover:text-white";
+                    blocoU.classList.remove('hidden'); blocoC.classList.add('hidden');
+                    document.getElementById('label-estoque').textContent = "Estoque Inicial (Unidades)";
+                }
+            },
+
+            abrirModalNovoProduto() {
+                document.getElementById('form-produto').reset();
+                document.getElementById('prod-id').value = '';
+                document.getElementById('form-produto-titulo').textContent = 'Cadastrar Produto';
+                this.setTipoProduto('chopp');
+                this.openModal('modal-produto');
+            },
+
+            editarProduto(id) {
+                const p = this.state.produtos.find(x => x.id_doc === id);
+                if(!p) return;
+
+                document.getElementById('form-produto-titulo').textContent = 'Editar Produto';
+                document.getElementById('prod-id').value = p.id_doc;
+                document.getElementById('prod-nome').value = p.nome;
+                document.getElementById('prod-estoque').value = p.estoque;
+                
+                this.setTipoProduto(p.tipo || 'chopp');
+                if(p.tipo === 'unidade') { document.getElementById('prod-preco-unico').value = p.precoUnico; } 
+                else {
+                    document.getElementById('prod-preco-300').value = p.precos[300];
+                    document.getElementById('prod-preco-400').value = p.precos[400];
+                    document.getElementById('prod-preco-500').value = p.precos[500];
+                }
+                this.openModal('modal-produto');
+            },
+
+            async salvarProduto(e) {
+                e.preventDefault();
+                this.closeModal('modal-produto'); // FECHA IMEDIATAMENTE
+                this.showToast('Processando...', 'Enviando para nuvem...', 'info');
+
+                const idDoc = document.getElementById('prod-id').value;
+                const tipo = document.getElementById('prod-tipo').value;
+                const dados = { nome: document.getElementById('prod-nome').value, tipo: tipo, estoque: parseFloat(document.getElementById('prod-estoque').value) };
+
+                if (tipo === 'chopp') {
+                    dados.precos = {
+                        300: parseFloat(document.getElementById('prod-preco-300').value || 0),
+                        400: parseFloat(document.getElementById('prod-preco-400').value || 0),
+                        500: parseFloat(document.getElementById('prod-preco-500').value || 0)
+                    };
+                } else {
+                    dados.precoUnico = parseFloat(document.getElementById('prod-preco-unico').value || 0);
+                }
+
+                try {
+                    if(idDoc) {
+                        const ref = doc(db, 'artifacts', appId, 'users', this.state.userId, 'produtos', idDoc);
+                        await setDoc(ref, dados, { merge: true });
+                        this.showToast('Sucesso', 'Produto atualizado.');
+                    } else {
+                        const colRef = collection(db, 'artifacts', appId, 'users', this.state.userId, 'produtos');
+                        await addDoc(colRef, dados);
+                        this.showToast('Sucesso', 'Produto criado com sucesso.');
+                    }
+                } catch(err) {
+                    this.showToast('Erro de Permissão', 'Ação bloqueada pelas regras.', 'error');
+                }
+            },
+
+            abrirModalBarril(idDoc) {
+                const p = this.state.produtos.find(x => x.id_doc === idDoc);
+                document.getElementById('barril-produto-id').value = p.id_doc;
+                document.getElementById('barril-nome-produto').textContent = p.nome;
+                document.getElementById('barril-quantidade').value = '';
+                
+                if(p.tipo === 'unidade') {
+                    document.getElementById('atalhos-chopp').classList.add('hidden');
+                    document.getElementById('atalhos-unidade').classList.remove('hidden');
+                    document.getElementById('label-qtd-add').textContent = "Quantas unidades adicionar?";
+                } else {
+                    document.getElementById('atalhos-unidade').classList.add('hidden');
+                    document.getElementById('atalhos-chopp').classList.remove('hidden');
+                    document.getElementById('label-qtd-add').textContent = "Quantos Litros adicionar?";
+                }
+                this.openModal('modal-barril');
+            },
+
+            setBarrilQtd(val) {
+                if(val > 0) document.getElementById('barril-quantidade').value = val;
+                else document.getElementById('barril-quantidade').focus();
+            },
+
+            async confirmarEntradaBarril() {
+                const idDoc = document.getElementById('barril-produto-id').value;
+                const qtd = parseFloat(document.getElementById('barril-quantidade').value);
+                if(isNaN(qtd) || qtd <= 0) return this.showToast('Erro', 'Quantidade inválida.', 'error');
+
+                this.closeModal('modal-barril'); // FECHA IMEDIATAMENTE
+                this.showToast('Processando...', 'Adicionando ao estoque...', 'info');
+
+                const p = this.state.produtos.find(x => x.id_doc === idDoc);
+                try {
+                    const ref = doc(db, 'artifacts', appId, 'users', this.state.userId, 'produtos', idDoc);
+                    await setDoc(ref, { estoque: p.estoque + qtd }, { merge: true });
+                    this.showToast('Estoque', `+${qtd} injetados no sistema.`);
+                } catch(e) {
+                    this.showToast('Erro', 'Bloqueado por regras.', 'error');
+                }
+            },
+
+            openModal(id) {
+                const m = document.getElementById(id);
+                m.classList.remove('hidden');
+                setTimeout(() => { m.firstElementChild.classList.add('scale-100'); m.firstElementChild.classList.remove('translate-y-4', 'opacity-0'); }, 10);
+            },
+
+            closeModal(id) {
+                const m = document.getElementById(id);
+                m.firstElementChild.classList.remove('scale-100');
+                m.firstElementChild.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => { m.classList.add('hidden'); }, 150); // Tempo reduzido para maior fluidez
+            },
+
+            showToast(title, msg, type = 'success') {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-title').textContent = title;
+                document.getElementById('toast-msg').textContent = msg;
+                const icon = t.querySelector('i');
+                
+                t.className = "fixed top-4 right-4 z-[110] transform transition-all duration-300 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0";
+                
+                if(type === 'error') {
+                    t.classList.add('bg-red-900', 'border', 'border-red-500', 'text-white');
+                    icon.className = 'ph ph-warning-circle text-white text-2xl';
+                } else if(type === 'info') {
+                    t.classList.add('bg-gray-900', 'border', 'border-brand-gold', 'text-white');
+                    icon.className = 'ph ph-spinner animate-spin text-brand-gold text-2xl';
+                } else {
+                    t.classList.add('bg-brand-green', 'border', 'border-brand-gold', 'text-white');
+                    icon.className = 'ph ph-check-circle text-brand-gold text-2xl';
+                }
+                
+                setTimeout(() => { t.classList.remove('translate-y-[-150%]', 'opacity-0'); }, 10);
+                setTimeout(() => { t.classList.add('translate-y-[-150%]', 'opacity-0'); }, 3000);
+            }
+        };
+
+        window.onload = () => App.init();
+    </script>
+</body>
+</html>
