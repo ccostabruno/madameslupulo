@@ -51,7 +51,6 @@
         body.light-mode { background-color: #f3f4f6; color: #111827; }
         body.light-mode .bg-brand-dark { background-color: #f9fafb !important; }
         body.light-mode .bg-brand-dark\/50 { background-color: #f3f4f6 !important; }
-        body.light-mode .bg-gray-900 { background-color: #e5e7eb !important; }
         body.light-mode .bg-brand-panel { background-color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         body.light-mode .bg-brand-green { background-color: #ffffff !important; border-bottom-color: #e5e7eb !important; }
         body.light-mode .text-white { color: #111827 !important; }
@@ -126,11 +125,11 @@
             </nav>
         </header>
 
-        <main class="flex-1 overflow-y-auto bg-brand-dark p-4 relative pb-20">
-            <div class="max-w-5xl mx-auto h-full">
+        <main class="flex-1 overflow-y-auto bg-brand-dark p-4 relative pb-32">
+            <div class="max-w-5xl mx-auto">
                 
                 <!-- ABA PDV -->
-                <div id="view-pdv" class="h-full flex flex-col fade-in">
+                <div id="view-pdv" class="flex flex-col fade-in">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-serif text-brand-gold">Selecione o Produto</h2>
                         <span id="pdv-date" class="text-sm text-gray-400"></span>
@@ -139,47 +138,42 @@
                 </div>
 
                 <!-- ABA ESTOQUE -->
-                <div id="view-estoque" class="hidden h-full flex flex-col fade-in">
+                <div id="view-estoque" class="hidden flex flex-col fade-in">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-serif text-brand-gold">Estoque Atual</h2>
                         <button onclick="App.abrirModalNovoProduto()" class="bg-brand-gold text-brand-dark px-3 py-1.5 rounded font-bold flex items-center gap-1 hover:bg-brand-gold_light transition-colors shadow-lg">
                             <i class="ph ph-plus-circle text-lg"></i> Novo
                         </button>
                     </div>
-                    <div class="bg-brand-panel rounded-lg border border-brand-gold/10 overflow-hidden shadow-xl mb-20">
+                    <div class="bg-brand-panel rounded-lg border border-brand-gold/10 overflow-hidden shadow-xl mb-10">
                         <ul id="estoque-list" class="divide-y divide-gray-800"></ul>
                     </div>
                 </div>
 
                 <!-- ABA HISTORICO -->
-                <div id="view-historico" class="hidden h-full flex flex-col fade-in">
-                    <!-- Topo do Histórico com Botões Lado a Lado -->
+                <div id="view-historico" class="hidden flex flex-col fade-in">
+                    <!-- CABEÇALHO HISTÓRICO ADAPTADO PARA MOBILE -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 bg-brand-green p-4 rounded-xl border border-brand-gold/30">
                         <div class="flex flex-col w-full md:w-auto">
                             <label class="text-xs text-brand-gold font-medium mb-1">Data do Movimento</label>
-                            <input type="date" id="filtro-data" onchange="App.renderHistorico()" class="bg-brand-dark border border-brand-gold/50 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:border-brand-gold text-sm w-full md:w-44">
+                            <input type="date" id="filtro-data" onchange="App.renderHistorico()" class="bg-brand-dark border border-brand-gold/50 rounded-lg px-3 py-2 text-white font-bold focus:outline-none focus:border-brand-gold text-sm w-full">
                         </div>
                         
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <button onclick="App.abrirVendasDetalhadas()" class="flex-1 md:flex-none bg-brand-dark border border-gray-700 text-gray-300 px-3 py-2 rounded-lg text-center flex items-center justify-center gap-2 hover:border-brand-gold transition-colors shadow-lg">
-                                <i class="ph ph-list-dashes text-xl"></i>
-                                <div class="text-left hidden sm:block">
-                                    <div class="text-[10px] uppercase tracking-wider leading-none">Por Produto</div>
-                                    <div class="font-bold text-sm leading-none mt-1">Detalhado</div>
-                                </div>
+                        <!-- BOTÕES LADO A LADO NO CELULAR (GRID) -->
+                        <div class="grid grid-cols-2 gap-2 w-full md:w-auto">
+                            <button onclick="App.abrirVendasDetalhadas()" class="bg-brand-dark border border-gray-700 text-gray-300 py-2 rounded-lg flex flex-col items-center justify-center hover:border-brand-gold transition-colors shadow-lg">
+                                <i class="ph ph-list-dashes text-xl mb-1"></i>
+                                <span class="text-[9px] uppercase font-bold leading-none">Detalhado</span>
                             </button>
-                            <button onclick="App.abrirResumoDia()" class="flex-1 md:flex-none bg-brand-panel border border-brand-gold px-3 py-2 rounded-lg text-center flex items-center justify-center gap-2 hover:bg-brand-dark transition-colors shadow-lg">
-                                <i class="ph ph-chart-line-up text-brand-gold text-xl"></i>
-                                <div class="text-left hidden sm:block">
-                                    <div class="text-[10px] text-gray-400 uppercase tracking-wider leading-none">Resumo Dia</div>
-                                    <div class="font-bold text-white text-sm leading-none mt-1">Valores</div>
-                                </div>
+                            <button onclick="App.abrirResumoDia()" class="bg-brand-panel border border-brand-gold py-2 rounded-lg flex flex-col items-center justify-center hover:bg-brand-dark transition-colors shadow-lg">
+                                <i class="ph ph-chart-line-up text-brand-gold text-xl mb-1"></i>
+                                <span class="text-[9px] text-white uppercase font-bold leading-none">Resumo Dia</span>
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Lista de Vendas Cronológica (Estilo Extrato) -->
-                    <div id="historico-list-container" class="bg-brand-panel rounded-lg border border-brand-gold/10 overflow-hidden shadow-xl mb-20">
+                    <!-- LISTA DE VENDAS ADAPTADA -->
+                    <div id="historico-list-container" class="bg-brand-panel rounded-lg border border-brand-gold/10 overflow-hidden shadow-xl mb-10">
                         <ul id="historico-list" class="divide-y divide-gray-800"></ul>
                     </div>
                 </div>
@@ -187,7 +181,7 @@
         </main>
     </div>
 
-    <!-- MODAL: VENDAS DETALHADAS POR PRODUTO -->
+    <!-- MODAL: VENDAS DETALHADAS -->
     <div id="modal-detalhado" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 fade-in">
         <div class="bg-brand-panel w-full max-w-4xl rounded-xl shadow-2xl border border-brand-gold/50 flex flex-col max-h-[85vh] transform transition-all duration-150 scale-95 translate-y-4 opacity-0">
             <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-brand-green rounded-t-xl shrink-0">
@@ -209,11 +203,13 @@
                 <h3 class="text-lg font-serif text-brand-gold font-bold flex items-center gap-2"><i class="ph ph-gear"></i> Opções do Sistema</h3>
                 <button onclick="App.closeModal('modal-config')" class="text-gray-400 hover:text-brand-gold"><i class="ph ph-x text-lg"></i></button>
             </div>
+            
             <div class="space-y-4">
                 <button onclick="App.toggleTheme()" class="w-full flex items-center justify-between bg-brand-dark border border-gray-700 p-4 rounded-lg hover:border-brand-gold transition-colors">
                     <span class="text-white font-bold flex items-center gap-2"><i id="icon-theme" class="ph ph-sun text-brand-gold text-xl"></i> Tema Visual</span>
                     <span id="text-theme" class="text-xs text-gray-400 font-bold uppercase tracking-wider">Escuro</span>
                 </button>
+                
                 <button onclick="App.fazerBackup()" class="w-full flex items-center justify-between bg-brand-dark border border-gray-700 p-4 rounded-lg hover:border-brand-gold transition-colors">
                     <span class="text-white font-bold flex items-center gap-2"><i class="ph ph-download-simple text-brand-gold text-xl"></i> Fazer Backup</span>
                     <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Baixar .json</span>
@@ -372,8 +368,6 @@
                 </div>
                 <h4 class="text-sm font-bold text-white border-b border-gray-800 pb-2 mb-3"><i class="ph ph-wallet mr-1 text-brand-gold"></i> Por Pagamento</h4>
                 <div class="space-y-2 mb-6 text-sm" id="resumo-pagamentos"></div>
-                <h4 class="text-sm font-bold text-white border-b border-gray-800 pb-2 mb-3"><i class="ph ph-beer-stein mr-1 text-brand-gold"></i> Por Produto</h4>
-                <div class="space-y-3 text-sm" id="resumo-produtos"></div>
             </div>
         </div>
     </div>
@@ -487,24 +481,15 @@
 
             fazerBackup() {
                 this.showToast('Processando...', 'Gerando arquivo de backup...', 'info');
-                
-                const backupData = {
-                    data_extracao: new Date().toISOString(),
-                    produtos: this.state.produtos,
-                    historico: this.state.historico
-                };
-
+                const backupData = { data_extracao: new Date().toISOString(), produtos: this.state.produtos, historico: this.state.historico };
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
                 const downloadAnchorNode = document.createElement('a');
                 downloadAnchorNode.setAttribute("href", dataStr);
-                
                 const dataAtual = new Date().toLocaleDateString('pt-BR').replaceAll('/', '-');
                 downloadAnchorNode.setAttribute("download", `backup-madameslupulo-${dataAtual}.json`);
-                
                 document.body.appendChild(downloadAnchorNode); 
                 downloadAnchorNode.click();
                 downloadAnchorNode.remove();
-                
                 setTimeout(() => {
                     this.showToast('Sucesso', 'Backup baixado com sucesso!');
                     this.closeModal('modal-config');
@@ -557,7 +542,6 @@
                     this.state.historico = [];
                     snap.forEach(doc => this.state.historico.push({ id_doc: doc.id, ...doc.data() }));
                     this.renderHistorico();
-                    
                     if(!document.getElementById('modal-detalhado').classList.contains('hidden')) {
                         this.abrirVendasDetalhadas();
                     }
@@ -635,17 +619,17 @@
                     const precosTxt = p.tipo === 'unidade' ? `R$ ${p.precoUnico.toFixed(2)}` : `300ml: R$${p.precos[300]} | 400ml: R$${p.precos[400]} | 500ml: R$${p.precos[500]}`;
 
                     li.innerHTML = `
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="bg-gray-800 text-gray-300 text-[10px] uppercase px-2 py-0.5 rounded font-bold">${p.tipo === 'unidade' ? 'Unidade' : 'Chopp'}</span>
-                                <h4 class="font-bold text-white text-base">${p.nome}</h4>
-                                <button onclick="App.editarProduto('${p.id_doc}')" class="ml-2 text-brand-gold hover:text-white p-1 bg-brand-dark rounded border border-gray-800"><i class="ph ph-pencil-simple"></i></button>
+                                <span class="bg-gray-800 text-gray-300 text-[10px] uppercase px-2 py-0.5 rounded font-bold shrink-0">${p.tipo === 'unidade' ? 'Unidade' : 'Chopp'}</span>
+                                <h4 class="font-bold text-white text-base truncate">${p.nome}</h4>
+                                <button onclick="App.editarProduto('${p.id_doc}')" class="ml-2 text-brand-gold hover:text-white p-1 bg-brand-dark rounded border border-gray-800 shrink-0"><i class="ph ph-pencil-simple"></i></button>
                             </div>
                             <div class="w-full bg-brand-dark rounded-full h-2 mb-1.5 border border-gray-800 overflow-hidden"><div class="${barColor} h-full rounded-full transition-all duration-1000" style="width: ${pct}%"></div></div>
                             <div class="flex justify-between text-xs text-gray-400 font-medium"><span>${p.estoque.toFixed(1).replace('.',',')} ${p.tipo === 'unidade' ? 'Unidades' : 'Litros'}</span><span>${precosTxt}</span></div>
                         </div>
-                        <div class="shrink-0">
-                            <button onclick="App.abrirModalBarril('${p.id_doc}')" class="w-full sm:w-auto bg-brand-dark border border-brand-gold/40 text-brand-gold text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-black shadow-lg">
+                        <div class="shrink-0 w-full sm:w-auto">
+                            <button onclick="App.abrirModalBarril('${p.id_doc}')" class="w-full sm:w-auto bg-brand-dark border border-brand-gold/40 text-brand-gold text-sm font-bold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-black shadow-lg flex items-center justify-center gap-1">
                                 <i class="ph ph-plus-circle"></i> Estoque
                             </button>
                         </div>
@@ -674,22 +658,22 @@
                     const pontoAudit = item.editada ? `<div class="w-2.5 h-2.5 bg-red-600 rounded-full shadow-[0_0_5px_red] shrink-0" title="Venda Editada"></div>` : '';
 
                     const li = document.createElement('li');
-                    li.className = "p-4 flex items-center justify-between hover:bg-brand-dark/40 transition-colors group";
+                    li.className = "p-3 flex items-center justify-between hover:bg-brand-dark/40 transition-colors group gap-2";
                     li.innerHTML = `
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <div class="text-gray-500 text-xs md:text-sm font-mono w-10 md:w-12 text-center bg-gray-900 rounded py-1">${time}</div>
-                            <div>
-                                <h4 class="font-bold text-white text-sm md:text-base leading-tight">${item.produtoNome}</h4>
+                        <div class="flex items-center gap-3 w-full overflow-hidden">
+                            <div class="text-gray-500 text-[10px] md:text-sm font-mono w-10 md:w-12 text-center bg-gray-900 rounded py-1 shrink-0">${time}</div>
+                            <div class="truncate flex-1">
+                                <h4 class="font-bold text-white text-sm md:text-base leading-tight truncate">${item.produtoNome}</h4>
                                 <div class="text-[10px] md:text-xs text-gray-400 flex items-center gap-2 mt-1">
-                                    <span class="bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded">${descQtd}</span>
-                                    <span class="flex items-center gap-1 text-brand-gold"><i class="ph ph-wallet"></i> ${item.pagamento}</span>
+                                    <span class="bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded shrink-0">${descQtd}</span>
+                                    <span class="flex items-center gap-1 text-brand-gold shrink-0"><i class="ph ph-wallet"></i> ${item.pagamento}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 md:gap-4 shrink-0">
+                        <div class="flex items-center gap-2 shrink-0">
                             ${pontoAudit}
                             <div class="text-white font-bold text-sm md:text-base whitespace-nowrap">R$ ${item.precoTotal.toFixed(2).replace('.',',')}</div>
-                            <button onclick="App.abrirEdicaoVenda('${item.id_doc}')" class="text-gray-500 hover:text-brand-gold p-1.5 bg-brand-dark rounded border border-gray-800"><i class="ph ph-pencil-simple text-lg"></i></button>
+                            <button onclick="App.abrirEdicaoVenda('${item.id_doc}')" class="text-gray-500 hover:text-brand-gold p-1.5 bg-brand-dark rounded border border-gray-800 shrink-0"><i class="ph ph-pencil-simple text-lg"></i></button>
                         </div>
                     `;
                     list.appendChild(li);
@@ -714,17 +698,17 @@
                 });
 
                 if(Object.keys(agrupado).length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Nenhuma saída registrada nesta data.</div>`;
+                    grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Nenhuma saída.</div>`;
                 } else {
                     Object.values(agrupado).forEach(grupo => {
                         const col = document.createElement('div');
-                        col.className = "bg-brand-dark border border-brand-gold/20 rounded-xl flex flex-col max-h-[400px] shadow-lg overflow-hidden";
+                        col.className = "bg-brand-dark border border-brand-gold/20 rounded-xl flex flex-col max-h-[300px] shadow-lg overflow-hidden";
                         const undStr = grupo.tipo === 'unidade' ? 'un' : 'L';
                         
                         let htmlList = `<div class="bg-brand-green p-3 border-b border-brand-gold/30 shrink-0">
                             <h3 class="font-serif text-brand-gold font-bold text-base truncate">${grupo.nome}</h3>
                             <div class="flex justify-between mt-1">
-                                <div><div class="text-[9px] text-gray-400 uppercase">Saída Total</div><div class="font-bold text-white text-sm">${grupo.totalQtd.toFixed(1).replace('.',',')} ${undStr}</div></div>
+                                <div><div class="text-[9px] text-gray-400 uppercase">Saída</div><div class="font-bold text-white text-sm">${grupo.totalQtd.toFixed(1).replace('.',',')} ${undStr}</div></div>
                                 <div class="text-right"><div class="text-[9px] text-gray-400 uppercase">Receita</div><div class="font-bold text-brand-gold text-sm">R$ ${grupo.totalRs.toFixed(2).replace('.',',')}</div></div>
                             </div>
                         </div><div class="flex-1 overflow-y-auto p-2 space-y-1">`;
@@ -751,7 +735,6 @@
                                 </div>
                             `;
                         });
-                        
                         htmlList += `</div>`;
                         col.innerHTML = htmlList;
                         grid.appendChild(col);
@@ -821,13 +804,10 @@
                 const vendas = this.state.historico.filter(h => h.data && h.data.startsWith(filtroData));
                 let tGeral = 0;
                 const payTotals = { "PIX": 0, "Dinheiro": 0, "Crédito": 0, "Débito": 0 };
-                const prodTotals = {};
-
+                
                 vendas.forEach(v => {
                     tGeral += v.precoTotal;
                     if(payTotals[v.pagamento] !== undefined) payTotals[v.pagamento] += v.precoTotal;
-                    if(!prodTotals[v.produtoNome]) prodTotals[v.produtoNome] = 0;
-                    prodTotals[v.produtoNome] += v.precoTotal;
                 });
 
                 document.getElementById('resumo-total-geral').textContent = `R$ ${tGeral.toFixed(2).replace('.',',')}`;
@@ -835,10 +815,6 @@
                 let payHtml = '';
                 Object.entries(payTotals).forEach(([k, v]) => { if(v > 0) payHtml += `<div class="flex justify-between items-center text-gray-300"><span>${k}</span><span class="font-bold text-white">R$ ${v.toFixed(2).replace('.',',')}</span></div>`; });
                 document.getElementById('resumo-pagamentos').innerHTML = payHtml || '<div class="text-gray-500 text-xs">Sem dados</div>';
-
-                let prodHtml = '';
-                Object.entries(prodTotals).forEach(([k, v]) => { prodHtml += `<div class="flex justify-between items-center text-gray-300"><span class="truncate pr-2">${k}</span><span class="font-bold text-brand-gold">R$ ${v.toFixed(2).replace('.',',')}</span></div>`; });
-                document.getElementById('resumo-produtos').innerHTML = prodHtml || '<div class="text-gray-500 text-xs">Sem dados</div>';
 
                 this.openModal('modal-resumo');
             },
@@ -928,7 +904,7 @@
                 
                 if (produto.estoque < qtdAbater) return this.showToast('Estoque', 'Saldo insuficiente.', 'error');
 
-                this.closeModal('modal-venda');
+                this.closeModal('modal-venda'); 
                 this.showToast('Enviando...', 'Registrando venda...', 'info');
 
                 try {
@@ -1024,7 +1000,7 @@
 
             async salvarProduto(e) {
                 e.preventDefault();
-                this.closeModal('modal-produto');
+                this.closeModal('modal-produto'); 
                 this.showToast('Processando...', 'Enviando para nuvem...', 'info');
 
                 const idDoc = document.getElementById('prod-id').value;
@@ -1084,14 +1060,14 @@
                 const qtd = parseFloat(document.getElementById('barril-quantidade').value);
                 if(isNaN(qtd) || qtd <= 0) return this.showToast('Erro', 'Quantidade inválida.', 'error');
 
-                this.closeModal('modal-barril');
+                this.closeModal('modal-barril'); 
                 this.showToast('Processando...', 'Adicionando ao estoque...', 'info');
 
                 const p = this.state.produtos.find(x => x.id_doc === idDoc);
                 try {
                     const ref = doc(db, 'artifacts', appId, 'users', this.state.userId, 'produtos', idDoc);
                     await setDoc(ref, { estoque: p.estoque + qtd }, { merge: true });
-                    this.showToast('Estoque', `+${qtd} injetados no sistema.`);
+                    this.showToast('Estoque', `+${qtd} adicionados ao sistema.`);
                 } catch(e) {
                     this.showToast('Erro', 'Bloqueado por regras.', 'error');
                 }
